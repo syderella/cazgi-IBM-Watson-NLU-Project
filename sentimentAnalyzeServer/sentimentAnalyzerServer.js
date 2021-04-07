@@ -95,17 +95,18 @@ const result =  analyzeInstance.analyze(analyzeParams)
 // ROUTE
 
 app.get("/url/emotion", async (req,res) => {
+    
 
-     let emotion = {}
-    // console.log(req.query)
-    // if (!req.query.url){return};
-    const output = await analyzeURL(req.query.url)
-    if (output === "err"){
-        emotion = `Invalid URL: ${req.query.url}`
-    } else {
-     emotion = (output.result.entities[0].emotion)}
-    //  console.log(emotion)
-    return res.send(emotion);
+    let emotion = {}
+    try {
+    const output = await analyzeURL(req.query.url) 
+    if (output.result.keywords) {
+     emotion = (output.result.entities[0].emotion) }
+    } catch(err) {
+    console.log("ERROR ALERT!")
+    emotion = "Bad URL"
+}
+    return res.send(emotion)
    
 });
 
@@ -113,63 +114,62 @@ app.get("/url/emotion", async (req,res) => {
 
 app.get("/text/emotion", async (req,res) => {
     let emotion =""
-    // console.log(req.query)
-    if (!req.query.text){return};
+   try {
+    const output = await analyzeText(req.query.text) 
+    console.log(output.result)
+    if (output.result.keywords) {
+     emotion = (output.result.keywords[0].emotion) }
+} catch(err) {
+    console.log("ERROR ALERT!")
+    emotion = "undetect"
+}
+//     return res.send(sentiment)
+    // if (!req.query.text){return};
    
-    const output = await analyzeText(req.query.text)
+    // const output = await analyzeText(req.query.text)
 
-    if (output === "err"){
-        emotion = `Unreadable words: ${req.query.text}`
-    } else {
-        // console.log(output.result.entities[0].emotion)
+    // if (output == "err"){
+    //     emotion = "undetect"
+    // } else {
+    //     console.log(output.result)
     
-        if (output.result.keywords.length > 0) {
-     emotion = (output.result.entities[0].emotion) }
-     else{
-         emotion = "Plase type more words.."
-     }
-
-    return res.send(emotion)};
+    //     if (output.result.keywords.length > 0) {
+    //  emotion = (output.result.keywords[0].emotion) }
+    //  else{
+    //      emotion = "undetect"
+    //  }
+    return res.send(emotion)
 });
 
 
 
 app.get("/url/sentiment", async (req,res) => {
     let sentiment =""
-    // console.log(req.query)
-    if (!req.query.url){return};
-    const output = await analyzeURL(req.query.url)
- 
-    if (output === "err"){
-        sentiment = `Invalid URL: ${req.query.url}`
-    } else {
-     sentiment = (output.result.entities[0].sentiment.label)}
-    return res.send(sentiment);
+   try {
+    const output = await analyzeURL(req.query.url) 
+    if (output.result.keywords) {
+     sentiment = (output.result.entities[0].sentiment.label) }
+} catch(err) {
+    console.log("ERROR ALERT!")
+    sentiment = "Invalid URL .. Please try again"
+}
+    return res.send(sentiment)
+
 });
 
 
 
 app.get("/text/sentiment", async (req,res) => {
     let sentiment =""
-    // console.log(req.query)
-    if (!req.query.text){return};
-   
-    const output = await analyzeText(req.query.text)
-
-    if (output === "err"){
-        sentiment = `Unreadable words: ${req.query.text}`
-    } else {
-        // console.log(output.result.entities)
-        // console.log(output.result.keywords)
-        if (output.result.keywords.length > 0) {
-
-     sentiment = (output.result.entities[0].sentiment.label) }
-     else{
-         sentiment = "Plase type more words.."
-     }
-
-    return res.send(sentiment)};
-
+   try {
+    const output = await analyzeText(req.query.text) 
+    if (output.result.keywords) {
+     sentiment = (output.result.keywords[0].sentiment.label) }
+} catch(err) {
+    console.log("ERROR ALERT!")
+    sentiment = "Undetacting words.. Please try again or type more words.."
+}
+    return res.send(sentiment)
 });
 
 
